@@ -50,7 +50,13 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        this.deleteDatabase(Environment.getRootDirectory() + File.separator + "data/data/com.example.sukhbeer.assignment2/databases/departments.db");
+        File databaseFile = new File(Environment.getDataDirectory() + File.separator + "/data/com.example.sukhbeer.assignment2/databases/departments.db");
+        if(databaseFile.exists()){
+            deleteDatabase(String.valueOf(databaseFile));
+            Log.d("Database Existed","Deleted and recreating");
+        } else {
+            Log.d("Database doesn't exist","creating database");
+        }
         dBhelper = new DBhelper(this);
         db = dBhelper.getWritableDatabase();
         spinner = (Spinner) findViewById(R.id.spinner);
@@ -64,22 +70,18 @@ public class MainActivity extends ActionBarActivity {
                 switch (spin_val) {
                     case "2011":
                         url = "https://buyandsell.gc.ca/cds/public/spends/tpsgc-pwgsc_depenses-pm-spend-bd-EF-FY10-11.zip";
-                        //filename = "tpsgc-pwgsc_depenses-pm-spend-bd-EF-FY10-11/tpsgc-pwgsc_depenses-pm-spend-bd-EF-FY10-11.csv";
                         new DownloadFile().execute(url);//calls the download function
                         break;
                     case "2012":
                         url = "https://buyandsell.gc.ca/cds/public/spends/tpsgc-pwgsc_depenses-pm-spend-bd-EF-FY11-12.zip";
-                        //filename = "tpsgc-pwgsc_depenses-pm-spend-bd-EF-FY11-12/tpsgc-pwgsc_depenses-pm-spend-bd-EF-FY11-12.csv";
                         new DownloadFile().execute(url);//calls the download function
                         break;
                     case "2013":
                         url = "https://buyandsell.gc.ca/cds/public/spends/tpsgc-pwgsc_depenses-pm-spend-bd-EF-FY12-13.zip";
-                        //filename = "tpsgc-pwgsc_depenses-pm-spend-bd-EF-FY12-13/tpsgc-pwgsc_depenses-pm-spend-bd-EF-FY12-13.csv";
                         new DownloadFile().execute(url);//calls the download function
                         break;
                     case "2014":
                         url = "https://buyandsell.gc.ca/cds/public/spends/tpsgc-pwgsc_depenses-pm-spend-bd-EF-FY13-14.zip";
-                        //filename = "tpsgc-pwgsc_depenses-pm-spend-bd-EF-FY13-14/tpsgc-pwgsc_depenses-pm-spend-bd-EF-FY13-14.csv";
                         new DownloadFile().execute(url);//calls the download function
                         break;
                 }
@@ -91,7 +93,6 @@ public class MainActivity extends ActionBarActivity {
             }
 
         });
-        dBhelper = new DBhelper(this);
 
     }
 
@@ -108,7 +109,7 @@ public class MainActivity extends ActionBarActivity {
                 pBar.setCancelable(true);
                 pBar.show();
                 return pBar;
-            case progress2: // we set this to 0
+            case progress2: // we set this to 1
                 pBar2 = new ProgressDialog(this);
                 pBar2.setMessage("unzipping file. Please wait...");
                 pBar2.setIndeterminate(false);
@@ -117,7 +118,7 @@ public class MainActivity extends ActionBarActivity {
                 pBar2.setCancelable(true);
                 pBar2.show();
                 return pBar2;
-            case progress3: // we set this to 0
+            case progress3: // we set this to 2
                 pBar3 = new ProgressDialog(this);
                 pBar3.setMessage("Reading downloaded file. Please wait...");
                 pBar3.setIndeterminate(false);
@@ -298,8 +299,6 @@ public class MainActivity extends ActionBarActivity {
         protected void onPostExecute(String file_url) {
             // dismiss the dialog after the file was downloaded
             dismissDialog(progress3);
-            // unzip();
-
         }
     }
 
