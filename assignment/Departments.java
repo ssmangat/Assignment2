@@ -1,9 +1,11 @@
 package com.example.sukhbeer.assignment;
 
+import java.io.Serializable;
+
 /**
  * Created by Sukhbeer on 2015-12-01.
  */
-public class Departments {
+public class Departments implements Serializable{
     public String Department;
     public String Commodity_family;
     public String Commodity_group;

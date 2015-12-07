@@ -1,7 +1,9 @@
 package com.example.sukhbeer.assignment;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Parcelable;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.StaticLayout;
@@ -12,6 +14,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+
+import java.io.Serializable;
 
 
 public class Activity_2 extends ActionBarActivity {
@@ -41,7 +45,9 @@ public class Activity_2 extends ActionBarActivity {
     private String[] period = {"Select Period"};
     private String periodString = "period";
     public String period_val;
-
+    public static String query;
+    public static String Answer;
+    public static Departments departmentsStore;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,7 +91,7 @@ public class Activity_2 extends ActionBarActivity {
                     Log.d("Nothing","selected");
                 } else {
                     department_val = department_val.replace("\"","");
-                    selectCommodityGroup(department_val.replace("\"",""), commodity_val);
+                    selectCommodityGroup(department_val.replace("\"", ""), commodity_val);
                 }
             }
 
@@ -150,7 +156,7 @@ public class Activity_2 extends ActionBarActivity {
     }
 
     private void selectCommoditySubCategory(final String department_val, final String commodity_val, final String commodity_group_val, final String category_val) {
-        updateCommoditySubCategory();
+        updateCommoditySubCategory(department_val, commodity_val, commodity_group_val, category_val);
         Spinner spinner2 = (Spinner) findViewById(R.id.spinner6);
         ArrayAdapter<String> arrayAdapter2 = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item, commodity_sub);
         spinner2.setAdapter(arrayAdapter2);
@@ -162,11 +168,6 @@ public class Activity_2 extends ActionBarActivity {
                 if (sub_cat_val.equals("Please select one commodity sub-category")) {
                     Log.d("Nothing","selected");
                 } else {
-                    Log.d("Values",department_val);
-                    Log.d("Values",commodity_val);
-                    Log.d("Values",commodity_group_val);
-                    Log.d("Values",category_val);
-                    Log.d("Values",sub_cat_val);
                     selectFiscalYear(department_val, commodity_val, commodity_group_val, category_val, sub_cat_val);
                 }
             }
@@ -178,7 +179,7 @@ public class Activity_2 extends ActionBarActivity {
     }
 
     private void selectFiscalYear(final String department_val, final String commodity_val, final String commodity_group_val, final String category_val, final String sub_cat_val) {
-        updateFiscalYear();
+        updateFiscalYear(department_val, commodity_val, commodity_group_val, category_val, sub_cat_val);
         Spinner spinner2 = (Spinner) findViewById(R.id.spinner7);
         ArrayAdapter<String> arrayAdapter2 = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item, fiscal_year);
         spinner2.setAdapter(arrayAdapter2);
@@ -200,7 +201,7 @@ public class Activity_2 extends ActionBarActivity {
         });
     }
 
-    private void updateFiscalYear() {
+    private void updateFiscalYear(String department_val, String commodity_val, String commodity_group_val, String category_val, String sub_cat_val) {
         SQLiteDatabase db = dBhelper.getReadableDatabase();
         Cursor cursor = db.query(true, "Departments", new String[]{yearString}, departmentString + " =  \"" + department_val + "\" AND " + commodityString + "= \"" + commodity_val + "\" AND " + commodityGroupString + " = \"" + commodity_group_val + "\"" + " AND " + categoryString + " = \"" + category_val + "\"" + " AND " + subCatString + " = \"" + sub_cat_val + "\"", null, null, null, null, null);
         String data = "";
@@ -220,7 +221,7 @@ public class Activity_2 extends ActionBarActivity {
     }
 
     private void selectQuater(final String department_val, final String commodity_val, final String commodity_group_val, final String category_val, final String sub_cat_val, final String year_val) {
-        updateQuarter(department_val,commodity_val,commodity_group_val,category_val,sub_cat_val,year_val);
+        updateQuarter(department_val, commodity_val, commodity_group_val, category_val, sub_cat_val, year_val);
         Spinner spinner2 = (Spinner) findViewById(R.id.spinner8);
         ArrayAdapter<String> arrayAdapter2 = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item, quarter);
         spinner2.setAdapter(arrayAdapter2);
@@ -230,11 +231,12 @@ public class Activity_2 extends ActionBarActivity {
                 quater_val = quarter[position];
                 Log.d("Spin value", quater_val);
                 if (quater_val.equals("Please select quater")) {
-                    Log.d("Nothing","selected");
+                    Log.d("Nothing", "selected");
                 } else {
                     selectPeriod(department_val, commodity_val, commodity_group_val, category_val, sub_cat_val, year_val, quater_val);
                 }
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 
@@ -262,7 +264,7 @@ public class Activity_2 extends ActionBarActivity {
     }
 
     private void selectPeriod(String department_val, String commodity_val, String commodity_group_val, String category_val, String sub_cat_val, String year_val, String quater_val) {
-        updatePeriod(department_val,commodity_val,commodity_group_val,category_val,sub_cat_val,year_val,quater_val);
+        updatePeriod(department_val, commodity_val, commodity_group_val, category_val, sub_cat_val, year_val, quater_val);
         Spinner spinner2 = (Spinner) findViewById(R.id.spinner9);
         ArrayAdapter<String> arrayAdapter2 = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item, period);
         spinner2.setAdapter(arrayAdapter2);
@@ -272,11 +274,12 @@ public class Activity_2 extends ActionBarActivity {
                 period_val = period[position];
                 Log.d("Spin value", period_val);
                 if (period_val.equals("Please select Period")) {
-                    Log.d("Nothing","selected");
+                    Log.d("Nothing", "selected");
                 } else {
-                    //selectPeriod(department_val, commodity_val, commodity_group_val, category_val, sub_cat_val, year_val, quater_val);
+                    startFinalActivity();
                 }
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 
@@ -303,9 +306,9 @@ public class Activity_2 extends ActionBarActivity {
         cursor.close();
     }
 
-    private void updateCommoditySubCategory() {
+    private void updateCommoditySubCategory(String department_val, String commodity_val, String commodity_group_val, String category_val) {
         SQLiteDatabase db = dBhelper.getReadableDatabase();
-        Cursor cursor = db.query(true, "Departments", new String[]{subCatString}, departmentString + " =  \"" + department_val + "\" AND " + commodityString + "= \"" + commodity_val + "\" AND " + commodityGroupString + " = \"" + commodity_group_val.replace("\"","") + "\" AND " + categoryString + " = \"" + category_val.replace("\"","") + "\"", null, null, null, null, null);
+        Cursor cursor = db.query(true, "Departments", new String[]{subCatString}, departmentString + " =  \"" + department_val + "\" AND " + commodityString + "= \"" + commodity_val + "\" AND " + commodityGroupString + " = \"" + commodity_group_val.replace("\"", "") + "\" AND " + categoryString + " = \"" + category_val.replace("\"", "") + "\"", null, null, null, null, null);
         String data = "";
         commodity_sub = new String[cursor.getCount()+1];
         cursor.moveToFirst();
@@ -397,6 +400,16 @@ public class Activity_2 extends ActionBarActivity {
         cursor.close();
     }
 
+    private void startFinalActivity() {
+
+        departmentsStore = new Departments(department_val,commodity_val,commodity_group_val,category_val,sub_cat_val,year_val,quater_val,period_val,"0");
+        //query = departmentString + " =  \"" + department_val + "\" AND " + commodityString + "= \"" + commodity_val + "\" AND " + commodityGroupString + " = \"" + commodity_group_val + "\"" + " AND " + categoryString + " = \"" + category_val + "\"" + " AND " + subCatString + " = \"" + sub_cat_val + "\"" + " AND " + yearString + " = \"" + year_val + "\"" + " AND " + quaterString + " = \"" + quater_val + "\" AND " + this.periodString + " = " + "\"" + this.period_val + "\"" ;
+        //Log.d("Mehant da natija",query);
+        //Answer = "The amount For " + department_val + " For "  + commodity_val + " from " + commodity_group_val + " Sub-Categorized as "+ category_val + " and " + sub_cat_val + " from fiscal-year " + year_val + " And Quater "+ quater_val + " and period of "+ this.period_val + " is :" ;
+        Intent intent = new Intent(this, Result.class);
+        intent.putExtra("departments", (Serializable) departmentsStore);
+        startActivity(intent);
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
